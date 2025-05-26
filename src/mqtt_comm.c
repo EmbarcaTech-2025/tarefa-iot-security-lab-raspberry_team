@@ -10,7 +10,7 @@ static mqtt_client_t *client;
 /* Callback de conexão MQTT - chamado quando o status da conexão muda
  * Parâmetros:
  *   - client: instância do cliente MQTT
- *   - arg: argumento opcional (não usado aqui)
+ *   - arg: argumento opcional (não usado aqui) 
  *   - status: resultado da tentativa de conexão */
 static void mqtt_connection_cb(mqtt_client_t *client, void *arg, mqtt_connection_status_t status) {
     if (status == MQTT_CONNECT_ACCEPTED) {
@@ -93,5 +93,51 @@ void mqtt_comm_publish(const char *topic, const uint8_t *data, size_t len) {
 
     if (status != ERR_OK) {
         printf("mqtt_publish falhou ao ser enviada: %d\n", status);
+    }
+}
+
+/* Callback chamado quando uma mensagem começa a ser recebida
+ * Parâmetros:
+ *   - arg: argumento opcional
+ *   - topic: tópico recebido
+ *   - tot_len: tamanho total da mensagem */
+static void mqtt_incoming_publish_cb(void *arg, const char *topic, u32_t tot_len) {
+    printf("Mensagem recebida no tópico: %s (tamanho: %lu bytes)\n", topic, (unsigned long)tot_len);
+}
+
+/* Callback chamado conforme os dados da mensagem chegam (pode ser em partes)
+ * Parâmetros:
+ *   - arg: argumento opcional
+ *   - data: ponteiro para os dados recebidos
+ *   - len: tamanho da parte recebida
+ *   - flags: indica se esta é a última parte da mensagem */
+static void mqtt_incoming_data_cb(void *arg, const u8_t *data, u16_t len, u8_t flags) {
+    if (flags & MQTT_DATA_FLAG_LAST) {
+        printf("Payload recebido (%u bytes): %.*s\n", len, len, (const char *)data);
+        printf("Valor recebido: %d\n", data);
+        // Aqui você pode tratar os dados recebidos como desejar
+    }
+}
+
+/* Função para assinar um tópico MQTT
+ * Parâmetros:
+ *   - topic: tópico a ser assinado
+ */
+void mqtt_comm_subscribe(const char *topic) {
+    if (client == NULL) {
+        printf("Cliente MQTT não inicializado.\n");
+        return;
+    }
+
+    // Define os callbacks para mensagens recebidas
+    mqtt_set_inpub_callback(client, mqtt_incoming_publish_cb, mqtt_incoming_data_cb, NULL);
+
+    // Assina o tópico com QoS 0
+    err_t err = mqtt_subscribe(client, topic, 0, NULL, NULL);
+
+    if (err == ERR_OK) {
+        printf("Assinatura no tópico '%s' enviada com sucesso.\n", topic);
+    } else {
+        printf("Falha ao assinar o tópico '%s': %d\n", topic, err);
     }
 }

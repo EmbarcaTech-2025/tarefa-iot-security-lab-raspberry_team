@@ -12,11 +12,11 @@ int main() {
     
     // Conecta à rede WiFi
     // Parâmetros: Nome da rede (SSID) e senha
-    connect_to_wifi("SSID da rede", "Senha da rede");
+    connect_to_wifi("VIVOFIBRA-WIFI6-A2F1", "QT3HRPiPAdx5aaL");
 
     // Configura o cliente MQTT
     // Parâmetros: ID do cliente, IP do broker, usuário, senha
-    mqtt_setup("bitdog1", "IP do broker", "aluno", "senha123");
+    mqtt_setup("bitdog1", "192.168.15.14", "aluno", "senha123");
 
     // Mensagem original a ser enviada
     const char *mensagem = "26.5";
@@ -26,13 +26,20 @@ int main() {
     xor_encrypt((uint8_t *)mensagem, criptografada, strlen(mensagem), 42);
 
     // Loop principal do programa
+    bool inscrito = false;  // Flag para garantir que só assine uma vez
+
     while (true) {
+        if (!inscrito) {
+            mqtt_comm_subscribe("escola/sala1/temperatura");
+            inscrito = true;
+        }
+
         // Publica a mensagem original (não criptografada)
         mqtt_comm_publish("escola/sala1/temperatura", mensagem, strlen(mensagem));
-        
-        // Alternativa: Publica a mensagem criptografada (atualmente comentada)
-        // mqtt_comm_publish("escola/sala1/temperatura", criptografada, strlen(mensagem));
-        
+
+        // Alternativa: Publica a mensagem criptografada
+        //mqtt_comm_publish("escola/sala1/temperatura", criptografada, strlen(mensagem));
+
         // Aguarda 5 segundos antes da próxima publicação
         sleep_ms(5000);
     }
