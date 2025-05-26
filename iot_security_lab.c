@@ -6,20 +6,22 @@
 #include "include/mqtt_comm.h"      // Funções personalizadas para MQTT
 #include "include/xor_cipher.h"     // Funções de cifra XOR
 
+#include <time.h>
+
 int main() {
     // Inicializa todas as interfaces de I/O padrão (USB serial, etc.)
     stdio_init_all();
     
     // Conecta à rede WiFi
     // Parâmetros: Nome da rede (SSID) e senha
-    connect_to_wifi("VIVOFIBRA-WIFI6-A2F1", "QT3HRPiPAdx5aaL");
+    connect_to_wifi("AP-ACCESS BLH", "Fin@ApointBlH");
 
     // Configura o cliente MQTT
     // Parâmetros: ID do cliente, IP do broker, usuário, senha
-    mqtt_setup("bitdog1", "192.168.15.14", "aluno", "senha123");
+    mqtt_setup("bitdog10", "172.19.9.116", "aluno", "aluno");
 
     // Mensagem original a ser enviada
-    const char *mensagem = "26.5";
+    char mensagem[1000];
     // Buffer para mensagem criptografada (16 bytes)
     uint8_t criptografada[16];
     // Criptografa a mensagem usando XOR com chave 42
@@ -34,11 +36,15 @@ int main() {
             inscrito = true;
         }
 
-        // Publica a mensagem original (não criptografada)
-        mqtt_comm_publish("escola/sala1/temperatura", mensagem, strlen(mensagem));
+        // Mensagem com time
+        // sprintf(mensagem, "{\"Messagem\":\"Mensagem secreta!\",\"ts\":%lu}", time(NULL));
 
-        // Alternativa: Publica a mensagem criptografada
-        //mqtt_comm_publish("escola/sala1/temperatura", criptografada, strlen(mensagem));
+        // //printf("Data: %lu", time(NULL));
+        // // Publica a mensagem original (não criptografada)
+        // mqtt_comm_publish("escola/sala1/temperatura", mensagem, strlen(mensagem));
+
+        // // Alternativa: Publica a mensagem criptografada
+        // //mqtt_comm_publish("escola/sala1/temperatura", criptografada, strlen(mensagem));
 
         // Aguarda 5 segundos antes da próxima publicação
         sleep_ms(5000);

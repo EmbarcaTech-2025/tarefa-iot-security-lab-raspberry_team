@@ -3,6 +3,11 @@
 // Base: https://github.com/BitDogLab/BitDogLab-C/blob/main/wifi_button_and_led/lwipopts.h
 #include "lwipopts.h"             // Configurações customizadas do lwIP
 
+
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
 /* Variável global estática para armazenar a instância do cliente MQTT
  * 'static' limita o escopo deste arquivo */
 static mqtt_client_t *client;
@@ -57,7 +62,7 @@ void mqtt_setup(const char *client_id, const char *broker_ip, const char *user, 
     //   - mqtt_connection_cb: callback de status
     //   - NULL: argumento opcional para o callback
     //   - &ci: informações de conexão
-    mqtt_client_connect(client, &broker_addr, 1883, mqtt_connection_cb, NULL, &ci);
+    mqtt_client_connect(client, &broker_addr, 2000, mqtt_connection_cb, NULL, &ci);
 }
 
 /* Callback de confirmação de publicação
@@ -111,11 +116,54 @@ static void mqtt_incoming_publish_cb(void *arg, const char *topic, u32_t tot_len
  *   - data: ponteiro para os dados recebidos
  *   - len: tamanho da parte recebida
  *   - flags: indica se esta é a última parte da mensagem */
+// static void mqtt_incoming_data_cb(void *arg, const u8_t *data, u16_t len, u8_t flags) {
+//     if (flags & MQTT_DATA_FLAG_LAST) {
+        
+//         printf("Payload recebido (%u bytes): %.*s\n", len, len, (const char *)data);
+//         // Aqui você pode tratar os dados recebidos como desejar
+//     }
+// }
+
+// Simples parser de timestamp no JSON
+static long extract_ts_from_json(const char *json) {
+    const char *ts_ptr = strstr(json, "\"ts\":");
+    if (!ts_ptr) return -1;
+
+    // Avança para o número
+    ts_ptr += 5;
+
+    // Converte o valor numérico
+    return strtol(ts_ptr, NULL, 10);
+}
+
 static void mqtt_incoming_data_cb(void *arg, const u8_t *data, u16_t len, u8_t flags) {
+    printf("ENTROU AQUI!!!!!!\n");
     if (flags & MQTT_DATA_FLAG_LAST) {
         printf("Payload recebido (%u bytes): %.*s\n", len, len, (const char *)data);
-        printf("Valor recebido: %d\n", data);
-        // Aqui você pode tratar os dados recebidos como desejar
+
+        char payload[256] = {0};
+        memcpy(payload, data, len < 255 ? len : 255);
+
+        long received_ts = extract_ts_from_json(payload);
+        if (received_ts == -1) {
+            printf("Timestamp não encontrado ou inválido.\n");
+            return;
+        }
+
+        time_t now = time(NULL);
+        long diff = now - received_ts;
+
+        printf("Timestamp recebido: %ld\n", received_ts);
+        printf("Timestamp atual   : %ld\n", now);
+        printf("Diferença (s): %ld\n", diff);
+
+        // Se quiser rejeitar mensagens antigas (>30s por exemplo)
+        if (diff > 30 || diff < -30) {
+            printf("Mensagem rejeitada: diferença de tempo muito grande.\n");
+        } else {
+            printf("Mensagem dentro do tempo aceitável.\n");
+            // Processa normalmente...
+        }
     }
 }
 
@@ -141,3 +189,5 @@ void mqtt_comm_subscribe(const char *topic) {
         printf("Falha ao assinar o tópico '%s': %d\n", topic, err);
     }
 }
+
+
