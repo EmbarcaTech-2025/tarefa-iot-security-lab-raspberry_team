@@ -2,17 +2,35 @@
 
 # Tarefa: IoT Security Lab - EmbarcaTech 2025
 
-Autor: **Insira Seu Nome**
+Autor: **Danilo Naves do Nascimento e Gabriel**
 
 Curso: Residência Tecnológica em Sistemas Embarcados
 
 Instituição: EmbarcaTech - HBr
 
-Campinas, ___ de 2025
+Brasília, 27 de Maio de 2025
 
 ---
 
-<!-- INSIRA O CONTEÚDO DO SEU README AQUI! -->
+# Introdução
+
+Colocar aqui a introdução da atividade
+
+## 1. Configuração/inicialização do Wi-fi
+
+Para configurar o wifi, já existe uma função fornecida para isso. Então foi apenas necessário trocar as informações de conexão de rede.
+
+```c
+connect_to_wifi("Nome do Wifi", "Senha");
+```
+
+![Configuração finalizada](./img/conf-wifi.png)
+
+| Conexão feita com wi-fi
+
+## 2.  
+
+
 
 ---
 
