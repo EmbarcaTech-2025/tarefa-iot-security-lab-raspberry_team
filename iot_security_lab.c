@@ -25,7 +25,6 @@ int main() {
     // Buffer para mensagem criptografada (16 bytes)
     uint8_t criptografada[16];
     // Criptografa a mensagem usando XOR com chave 42
-    xor_encrypt((uint8_t *)mensagem, criptografada, strlen(mensagem), 42);
 
     // Loop principal do programa
     bool inscrito = false;  // Flag para garantir que só assine uma vez
@@ -37,15 +36,17 @@ int main() {
         }
 
         // Mensagem com time
-        // sprintf(mensagem, "{\"Messagem\":\"Mensagem secreta!\",\"ts\":%lu}", time(NULL));
+        sprintf(mensagem, "{\"Messagem\":\"Mensagem secreta!\",\"ts\":%lu}", time(NULL));
 
-        // //printf("Data: %lu", time(NULL));
-        
+        xor_encrypt((uint8_t *)mensagem, criptografada, strlen(mensagem), 42);
+
+        printf("Data: %lu", time(NULL));
+
         // Publica a mensagem original (não criptografada)
-        mqtt_comm_publish("escola/sala1/temperatura", mensagem, strlen(mensagem));
+        //mqtt_comm_publish("escola/sala1/temperatura", mensagem, strlen(mensagem));
 
-        // // Alternativa: Publica a mensagem criptografada
-        // //mqtt_comm_publish("escola/sala1/temperatura", criptografada, strlen(mensagem));
+        // Alternativa: Publica a mensagem criptografada
+        mqtt_comm_publish("escola/sala1/temperatura", criptografada, strlen(mensagem));
 
         // Aguarda 5 segundos antes da próxima publicação
         sleep_ms(5000);

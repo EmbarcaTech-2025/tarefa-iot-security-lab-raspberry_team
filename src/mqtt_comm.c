@@ -2,6 +2,7 @@
 #include "include/mqtt_comm.h"    // Header file com as declarações locais
 // Base: https://github.com/BitDogLab/BitDogLab-C/blob/main/wifi_button_and_led/lwipopts.h
 #include "lwipopts.h"             // Configurações customizadas do lwIP
+#include "include/xor_cipher.h"
 
 
 #include <string.h>
@@ -142,9 +143,14 @@ static void mqtt_incoming_data_cb(void *arg, const u8_t *data, u16_t len, u8_t f
         printf("Payload recebido (%u bytes): %.*s\n", len, len, (const char *)data);
 
         char payload[256] = {0};
+
+        char mensagem_no[256] = {};
+
         memcpy(payload, data, len < 255 ? len : 255);
 
-        long received_ts = extract_ts_from_json(payload);
+        xor_encrypt((uint8_t *)payload, mensagem_no, strlen(payload), 42);
+
+        long received_ts = extract_ts_from_json(mensagem_no);
         if (received_ts == -1) {
             printf("Timestamp não encontrado ou inválido.\n");
             return;

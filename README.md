@@ -85,7 +85,56 @@ Caso o usuário seja autenticado. A conexão com o broker será feita com sucess
 
 ![Novo usuário conectado](/img/client-connect.png)
 
-Um problema notável é a falta de privacidade sobre as informações acerca dos tópicos e dos corpos das mensagens. Sem uma criptografia, o pacote MQTT pode sofrer atacantes conhecido como Man-the-Middle, onde o atacante pode ler os corpos do pacote, alterar e fazer tentativas de replays.
+Um problema notável é a falta de privacidade sobre as informações acerca dos tópicos e dos corpos das mensagens. Sem uma criptografia, o pacote MQTT pode sofrer ataques conhecido como Man-the-Middle, onde o atacante pode ler os corpos do pacote, alterar e fazer tentativas de replays.
+
+A seguinte saída é recuperada pelo wireshark quando a mensagem é enviada pela rede.
+
+![Wireshark - Pacote Interceptado](img/wire-msg-nocrypt.png)
+
+Para resolver esse problema, é necessário criptografar a mensagem. Para isso, foi utilizado a criptografia XOR para isso. A função `xor_encrypt` foi utilizada para isso.
+
+A seguinte saída é recuperada pelo wireshark quando o pacote foi enviado para rede.
+
+![Wireshark - Pacote Interceptado](img/wire-msg-crypt.png)
+
+Como visto, o valor enviado pela rede, agora é criptografado.
+
+## Comunicação entre as duas placas e proteção contra replay
+
+Para a comunicação entre placa, foi necessário implementar as funções responsáveis por assinar os tópicos disponíveis no broker mosquitto.
+
+A função principal `mqtt_comm_subscribe` e seu conjunto foi implementada na arquivo/include `mqtt_commom.c/h`, nesta função, a segunda placa bitdoglab consegue recuperar os tópicos já enviados pela primeira placa e todas conectadas aquele broker.
+
+![Recebido](/img/recv-mqtt.png)
+
+Entrentanto, é necessário algumas validações para garantir a leitura desta mensagem.
+
+1. Descriptografar a mensagem quando o assinante receber a mensagem.
+
+![Cifração](/img/decrypt.png)
+
+2. Proteção contra replay.
+
+Para garantir a segurança da mensagem contra replay, é necessário que a mensagem venha acompanhada por um timestamp.
+
+Corpo da mensagem necessária:
+
+```json
+{
+    "mensagem": "Mensagem em string",
+    "ts": 30
+}
+```
+
+Neste caso, o valor de timestamp foi gerado pela função time(NULL), onde é retornado o tempo atual de execução da pico W.
+
+A proteção de replay verifica se a mensagem não foi enviada a 30 segundos antes. Caso a mensagem tenha um tempo menor que 30 segundos, a mensagem é negada pelo assinante.
+
+![Código replay](/img/replay.png)
+
+---
+
+# Questionário de Análise
 
 
 
