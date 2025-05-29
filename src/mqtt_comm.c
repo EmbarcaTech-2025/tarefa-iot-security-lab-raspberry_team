@@ -62,7 +62,7 @@ void mqtt_setup(const char *client_id, const char *broker_ip, const char *user, 
     //   - mqtt_connection_cb: callback de status
     //   - NULL: argumento opcional para o callback
     //   - &ci: informações de conexão
-    mqtt_client_connect(client, &broker_addr, 2000, mqtt_connection_cb, NULL, &ci);
+    mqtt_client_connect(client, &broker_addr, 1883, mqtt_connection_cb, NULL, &ci);
 }
 
 /* Callback de confirmação de publicação

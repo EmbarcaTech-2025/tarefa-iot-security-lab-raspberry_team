@@ -18,7 +18,7 @@ int main() {
 
     // Configura o cliente MQTT
     // Parâmetros: ID do cliente, IP do broker, usuário, senha
-    mqtt_setup("bitdog10", "172.19.9.116", "aluno", "aluno");
+    mqtt_setup("bitdog10", "192.168.15.14", "aluno", "senha123");
 
     // Mensagem original a ser enviada
     char mensagem[1000];
@@ -40,8 +40,9 @@ int main() {
         // sprintf(mensagem, "{\"Messagem\":\"Mensagem secreta!\",\"ts\":%lu}", time(NULL));
 
         // //printf("Data: %lu", time(NULL));
-        // // Publica a mensagem original (não criptografada)
-        // mqtt_comm_publish("escola/sala1/temperatura", mensagem, strlen(mensagem));
+        
+        // Publica a mensagem original (não criptografada)
+        mqtt_comm_publish("escola/sala1/temperatura", mensagem, strlen(mensagem));
 
         // // Alternativa: Publica a mensagem criptografada
         // //mqtt_comm_publish("escola/sala1/temperatura", criptografada, strlen(mensagem));

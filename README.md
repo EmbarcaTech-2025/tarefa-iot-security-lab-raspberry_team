@@ -28,7 +28,64 @@ connect_to_wifi("Nome do Wifi", "Senha");
 
 | Conexão feita com wi-fi
 
-## 2.  
+## 2.  Configuração do Broker Local - Mosquitto
+
+Para inicializar e configurar o mosquitto no Fedora 42 foi adicionado as seguintes linhas no arquivo ```/etc/mosquitto/mosquitto.conf```
+
+```shell
+listener 1883 0.0.0.0 // Porta padrão e aceitar endereços Ip de diferentes máquinas
+```
+
+```shell
+allow_anonymous falso // Modo com autenticação
+password_file /etc/mosquitto/passwd // Configuração com usuários para autenticação
+```
+
+Após isso, inicializar o servidor mosquitto com o seguinte comando:
+
+```
+sudo mosquitto -c /etc/mosquitto/mosquitto.conf -v // "-c" para indicar caminho do arquivo de configuração. "-v" para apresentar todos os logs de mensagem.
+```
+
+![Inicialização mosquitto](img/conf-mosquitto.png)
+
+Após a configuração do broker, é necessário configurar o endereço ip, nome e senha do broker na bitdoglab.
+
+O código fornecido já possui um função preparada para somente passar os parâmetros corretos.
+
+![Login no Broker](/img/broker-bitdoglab.png)
+
+| O ip `192.168.15.14` é o ip do broker.
+
+| Os outros campos são, respectivamente, `Nome do cliente`, `Nome de usuário` e `Senha de usuário`.
+
+Por fim, a pico W já está pronta para enviar mensagens aos tópicos.
+
+## Envio de mensagens a tópicos
+
+Para enviar mensagem a um tópico, foi utilizado a função `mqtt_comm_publish`
+
+![Função de envio de mensagem sem criptografia](/img/msg-nocrypt.png)
+
+Ao enviar a mensagem, a seguinte mensagem é printada no terminal serial da bitdoglab.
+
+![Mensagem MQTT enviada](/img/serial-msg-send.png)
+
+No wireshark, é possível ver o corpo da mensagem
+
+![Informações a claras](/img/wireshark-nocrypt.png)
+
+## Teste de autenticação e Criptografia
+
+Caso o cliente use algum usuário ou senha não cadastrada no `/etc/mosquitto/passwd`, é retornado o erro `not authorised`.
+
+![Usuário não conectado](/img/not-authorised.png)
+
+Caso o usuário seja autenticado. A conexão com o broker será feita com sucesso.
+
+![Novo usuário conectado](/img/client-connect.png)
+
+Um problema notável é a falta de privacidade sobre as informações acerca dos tópicos e dos corpos das mensagens. Sem uma criptografia, o pacote MQTT pode sofrer atacantes conhecido como Man-the-Middle, onde o atacante pode ler os corpos do pacote, alterar e fazer tentativas de replays.
 
 
 
