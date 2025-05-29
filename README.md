@@ -2,7 +2,7 @@
 
 # Tarefa: IoT Security Lab - EmbarcaTech 2025
 
-Autor: **Danilo Naves do Nascimento e Gabriel**
+Autor: **Danilo Naves do Nascimento e Gabriel Martins Ribeiro**
 
 Curso: Residência Tecnológica em Sistemas Embarcados
 
@@ -136,7 +136,41 @@ A proteção de replay verifica se a mensagem não foi enviada a 30 segundos ant
 
 # Questionário de Análise
 
+## Quais técnicas são escaláveis
 
+1. A utilização do protocolo MQTT (Publish/Subscribe) permite a comunicação entre uma rede de placas. Aém disso, um broker bem dimensionado pode suportar centenas de cliêntes simultâneos.
+
+2. A criptografia pode ser escalada para uma criptografia simétrica bem mais robusta.
+
+3. Para aumentar mais a segurança, é recomendado usar o TLS (Transport Layer Security), pois assim, todo o diálogo fica criptografado.
+
+## Como aplicá-las com várias BitDogLab em rede escolar?
+
+Para aplicar várias Raspberry Pi Pico W em uma rede escolar, é possível conectá-las entre si por meio do protocolo MQTT. Assim, permitindo que os dispositivos se comuniquem publicando e assinando mensagens em um broker central — o que facilita o gerenciamento e a escalabilidade em ambientes educacionais com múltiplos dispositivos.
+
+## Passos para Aplicação na Rede Escolar
+
+1. **Instalação de um Broker MQTT Local**
+   Instale um broker como o *Mosquitto* em um servidor da escola ou em um computador que ficará sempre ligado. Ele será o ponto central de comunicação entre as placas.
+
+2. **Conexão das Pico W ao Wi-Fi da Escola**
+   Cada Pico W deve ser configurada para se conectar à rede Wi-Fi da escola e estabelecer comunicação com o broker MQTT.
+
+3. **Estruturação dos Tópicos MQTT**
+   Defina uma organização lógica de tópicos (ex: `sala1/temp`, `lab2/presenca`) para que os dispositivos saibam o que enviar e o que escutar.
+
+4. **Publicação e Subscrição**
+   Configure as Pico W para enviarem dados (ex: sensores, botões) e escutarem comandos (ex: acionar LEDs, exibir mensagens) por meio desses tópicos.
+
+Por ser um ambiente educacional, a segurança é essencial, mesmo em redes locais. Para isso, é importante adotar práticas como:
+
+* **Criptografia com TLS**: Configure o broker para usar conexões seguras (MQTTS), protegendo os dados em trânsito contra interceptações.
+
+* **Autenticação com usuário e senha**: Cada Pico W deve usar credenciais para se conectar, impedindo acesso de dispositivos desconhecidos.
+
+* **Controle de acesso (ACLs)**: Restringa quais tópicos cada dispositivo pode publicar ou assinar, evitando que um dispositivo interfira nos dados de outro.
+
+* **Monitoramento de atividades**: Ative logs no broker para auditar conexões, detectar falhas e garantir integridade do sistema.
 
 ---
 
