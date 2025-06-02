@@ -14,7 +14,7 @@ Brasília, 27 de Maio de 2025
 
 # Introdução
 
-Colocar aqui a introdução da atividade
+Aqui se encontra a introdução da atividade
 
 ## 1. Configuração/inicialização do Wi-fi
 
